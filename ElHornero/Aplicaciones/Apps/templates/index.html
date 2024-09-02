@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    {% load static %}
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <link rel="stylesheet" href="{% static 'css/styles.css' %}">
+    <title>El Hornero Tradición</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <style>
+           .form-input:focus {
+            border: 3px solid #0075ff !important;
+            outline: none !important;
+            box-shadow: 3px 0px 30px rgba(163, 163, 163, 0.4) !important;
+        }
+        .error-message {
+            font-size: 12px;
+            margin-bottom: 0;
+            display: none;
+        }
+        .error-message-activo {
+            display: block;
+        }
+        .formulario_validacion-estado {
+            position: absolute;
+            top: 12px;
+            right: 10px;
+            bottom: 15px;
+            z-index: 100;
+            font-size: 16px;
+            opacity: 0;
+            color: red;
+        }
+        .formulario_grupo-correcto .formulario_validacion-estado {
+            color: #1ed12d;
+            opacity: 1;
+        }
+        .formulario_grupo-incorrecto .formulario_validacion-estado {
+            color: #bb2929;
+            opacity: 1;
+        }
+        .formulario_grupo-incorrecto .form-input {
+            border: 3px solid #bb2929 !important;
+        }
+        .formulario_input-error  {
+            font-size: 16px;
+            margin-bottom: 0;
+            margin-top: -1; /* Ajusta la distancia al campo */
+            display: none;
+            color: #bb2929;
+            text-align: left; /* Alinea el texto a la izquierda */
+        }
+        .formulario_input-error-activo {
+            display: block;
+        }
+        .formulario_input-error {
+            font-size: 16px; /* Asegúrate de que esta propiedad tenga una unidad como 'px' */
+            margin-bottom: 0;
+            margin-top: -21px; /* Ajusta la separación entre el campo y el mensaje */
+            color: #bb2929;
+            position: relative; /* Cambia a 'absolute' si quieres moverlo con 'left', 'right', 'top', o 'bottom' */
+            left: 10px; /* Ajusta esta propiedad si necesitas mover el mensaje horizontalmente */
+        }
+        .formulario_input_error {
+            font-size: 16px;
+            margin-bottom: 0;
+            margin-top: -21px; /* Ajusta la separación entre el campo y el mensaje */
+            color: #bb2929;
+            position: relative;
+            left: 10px;
+            display: none; /* Oculta por defecto */
+            text-align: left;
+        }
+
+        .formulario_input_error-activo {
+            display: block; /* Muestra el mensaje de error */
+        }
+
+
+        .alert-success {
+        width: 100%; /* Mismo ancho que los campos del formulario */
+        max-width: 400px; /* Máximo ancho igual al de los campos del formulario */
+        height: 40px; /* Mismo alto que los campos del formulario */
+        padding: 10px;
+        border: 1px solid #cccccc; /* Mismo borde que los campos del formulario */
+        border-radius: 20px; /* Mismo radio de borde que los campos del formulario */
+        background-color: rgb(24, 217, 47);  /*Mismo color de fondo que el campo del formulario */
+        color: white; /* Color del texto verde */
+        font-size: 16px; /* Tamaño de fuente igual al del campo del formulario */
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Sombra sutil */
+        margin: 10px auto; /* Centrar el mensaje */
+        position: relative; /* Para el botón de cerrar */
+    }
+
+
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-dark bg-blue" style="display: flex; justify-content: space-between; align-items: center;">
+        <div>
+            <a class="navbar-brand hornero" href="{% url 'index' %}">El Hornero Tradición</a>
+            <a class="navbar-brand lista-socios" href="{% url 'lista_socios' %}">Lista de Socios</a>
+        </div>
+        <form class="form-inline" action="" method="post" style="margin-top: 5px;">
+            <div class="search-container" style="position: relative;">
+                <input class="form-control mr-sm-2" type="search" placeholder="Buscar" aria-label="Search" style="width: 300px; height: 40px; padding: 10px; border: 1px solid #ced4da; border-radius: 5px; padding-right: 40px;">
+                <i class="formulario_validacion-estado fas fa-search search-icon" style="color: blue; position: absolute; right: 20px; top: 50%; transform: translateY(-50%);"></i>
+            </div>
+        </form>
+    </nav>
+    <div class="custom-container">
+        <div id="alert-container" class="alert alert-success hide" style="margin-top: -10px;">Registro exitoso</div><br>
+        <h2 style="margin-bottom: -35px; margin-top: -30px;">Formulario de Registro</h2> <br>
+        <form id="form-register" class="formulario" action="{% url 'registrar_socio' %}" method="post">
+            {% csrf_token %}
+            <div class="formulario_grupo" id="grupo_nombre">
+                <div class="input-container">
+                    <input type="text" name="nombre" id="nombre" autocomplete="name" placeholder="Ingrese un nombre" class="form-input" required>
+                    <i class="formulario_validacion-estado fas fa-times-circle"></i>
+                </div>
+                <p class="formulario_input-error">NOMBRE INVÁLIDO (el campo nombre debe tener solo letras y espacios)</p>
+            </div>
+            <div class="formulario_grupo" id="grupo_dni">
+                <div class="input-container">
+                    <input type="text" name="dni" id="dni" autocomplete="document-id" placeholder="Ingrese DNI" class="form-input" required>
+                    <i class="formulario_validacion-estado fas"></i>
+                </div>
+                <p id="error_dni" class="formulario_input-error">DNI INVÁLIDO (el campo permite hasta 8 dígitos)</p>
+                <p id="error_dni_existe" class="formulario_input_error hide">DNI ya existe</p>
+            </div>
+            
+            
+            <div class="formulario_grupo" id="grupo_direccion">
+                <div class="input-container">
+                    <input type="text" name="direccion" id="direccion" autocomplete="street-address" placeholder="Ingrese la dirección" class="form-input" required>
+                    <i class="formulario_validacion-estado fas fa-times-circle"></i>
+                </div>
+                <p class="formulario_input-error">DIRECCIÓN INVÁLIDA (puede tener letras, espacios y máximo 4 números)</p>
+            </div>
+        
+            <div class="formulario_grupo" id="grupo_telefono">
+                <div class="input-container">
+                    <input type="text" name="telefono" id="telefono" autocomplete="tel" placeholder="Ingrese el teléfono" class="form-input" required>
+                    <i class="formulario_validacion-estado fas fa-times-circle"></i>
+                </div>
+                <p class="formulario_input-error">TELÉFONO INVÁLIDO (máximo 20 caracteres, solo números, + , guiones o parentesis")</p>
+            </div>
+        
+            <div class="formulario_grupo" id="grupo_email">
+                <div class="input-container">
+                    <input type="email" name="email" id="email" autocomplete="email" placeholder="Ingrese el email" class="form-input" required>
+                    <i class="formulario_validacion-estado fas fa-times-circle"></i>
+                </div>
+                <p class="formulario_input-error">EMAIL INVÁLIDO (debe incluir "@")</p>
+            </div>
+        
+            <div class="formulario_grupo" id="grupo_num_socio">
+                <div class="input-container">
+                    <input type="text" name="num_socio" id="num_socio" autocomplete="n°socio" placeholder="Ingrese N° de Socio" class="form-input" required>
+                    <i class="formulario_validacion-estado fas fa-times-circle"></i>
+                </div>
+                <p class="formulario_input-error">N° DE SOCIO INVÁLIDO (máximo 10 caracteres, solo números)</p>
+                <p id="error_num_socio_existe" class="formulario_input_error hide">Número de socio ya existe</p>
+            </div>
+        
+            <div class="formulario_grupo" id="grupo_fecha_nacimiento">
+                <div class="input-container">
+                    <input type="text" name="fecha_nacimiento" id="fecha_nacimiento" autocomplete="bday" placeholder="Ingrese la fecha de nacimiento" class="form-input" required>
+                    <i class="formulario_validacion-estado fas fa-times-circle"></i>
+                </div>
+                <p class="formulario_input-error">FECHA DE NACIMIENTO INVÁLIDA (formato dd-mm-aaaa)</p>
+            </div>
+        
+            <button type="submit" class="btn-submit">Registrar</button>            
+        </form>
+        <div id="alert-container" class="hide"></div>
+    </div>
+  
+   <script>
+</script>
+    <script src="{% static 'js/index.js' %}"></script>
+
+        
+    
+    
+
+
+
+</body>
+</html>

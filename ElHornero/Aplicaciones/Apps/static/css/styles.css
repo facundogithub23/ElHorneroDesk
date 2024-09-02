@@ -1,0 +1,200 @@
+* {
+    padding: 0;
+    margin: 0;
+    box-sizing: border-box;
+}
+
+body {
+    width: 100%;
+    height: 100vh;
+    background-color: rgb(0, 166, 255);
+    font-family: 'Roboto', sans-serif;
+    overflow-x: hidden; /* Oculta el desplazamiento horizontal si hay algún problema */
+}
+
+/* Estilos del Navbar */
+.navbar {
+    background-color: rgb(0, 166, 255);
+    color: white;
+    padding: 10px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.navbar-brand.hornero {
+    color: white;
+    margin-left: 20px;
+}
+
+.navbar-brand.lista-socios {
+    color: white;
+    margin-right: 20px; /* Puedes ajustar el margen según sea necesario */
+}
+
+.navbar-brand {
+    margin-right: 20px;
+    text-decoration: none;
+    font-weight: bold;
+}
+
+.search-container {
+    position: relative;
+}
+
+.form-inline {
+    margin-right: 20px;
+}
+
+/* Estilos del contenedor principal */
+.custom-container {
+    text-align: center;
+    margin-top: 20px; /* Ajustado para reducir el espacio */
+}
+
+.custom-container h2 {
+    font-size: 22px;
+    margin-bottom: -10px; /* Ajusta este valor para reducir la distancia con los campos del formulario */
+    margin-top: 10px; /* Ajusta el margen superior según sea necesario */
+    padding-bottom: 7px;
+    position: relative;
+}
+
+h1 {
+    font-size: 22px;
+    margin-bottom: 7px;
+    padding-bottom: 7px;
+    position: relative;
+}
+
+h1::after {
+    content: "";
+    position: absolute;
+    height: 3px;
+    border-radius: 3px;
+    width: 120px;
+    left: 50%;
+    bottom: 0;
+    transform: translateX(-50%);
+}
+
+/* Estilos del campo de búsqueda en el navbar */
+.navbar-collapse form .form-control {
+    border-radius: 10px; /* Añade bordes redondeados */
+    border-color: transparent; /* Elimina el borde */
+    padding-left: 35px; /* Añade espacio a la izquierda para el icono */
+    background-image: url('https://cdn-icons-png.flaticon.com/512/64/64576.png'); /* Agrega el ícono de lupa */
+    background-size: 20px; /* Tamaño del ícono */
+    background-repeat: no-repeat; /* Evita que se repita */
+    background-position: 10px center; /* Posición del ícono */
+}
+
+/* Estilo del botón de búsqueda en el navbar */
+.navbar-collapse form .btn {
+    border-radius: 10px; /* Añade bordes redondeados */
+    margin-left: 10px; /* Añade espacio entre el campo y el botón */
+}
+
+/* Estilos del formulario */
+#form-register {
+    max-width: 50%;
+    width: 100%;
+    padding: 30px;
+    border-radius: 10px;
+    background-color: rgb(0, 166, 255);
+    color: white;
+    margin: 5px auto;
+}
+
+/* Estilos de los campos del formulario */
+.form-input, .form-control {
+    width: 100%;
+    height: 40px;
+    padding: 12px 6px;
+    margin-bottom: 25px;
+    border: 1px solid #ccc; /* Color del borde del campo de formulario */
+    outline: none;
+    background-color: white;
+    color: black;
+    border-radius: 10px;
+}
+
+.form-group {
+    margin-top: 20px; /* Espacio entre cada par de campo de entrada y mensaje de error */
+}
+.form-input:focus {
+    border: 3px solid #0075ff; /* Cambia el borde a azul */
+    outline: none; /* Elimina cualquier contorno adicional */
+    box-shadow: 0px 0px 10px rgba(0, 117, 255, 0.4); /* Aplica una sombra azul */
+}
+
+
+.input-container {
+    position: relative;
+}
+
+.error-message {
+    display: none;
+    color: red;
+    font-size: 14px;
+    position: absolute;
+    bottom: 30px; /* Ajusta según sea necesario */
+    left: 0;
+}
+
+/* Estilos del botón de envío */
+.btn-submit {
+    width: 100%;
+    height: 40px;
+    padding: 12px 6px;
+    border: none;
+    cursor: pointer;
+    border-radius: 20px;
+    background-color:  rgb(24, 217, 47);
+    color: white;
+    font-size: 18px;
+    transition: background-color 0.5s;
+    margin-bottom: 25px;
+}
+
+.btn-submit:hover {
+    background: rgb(24, 217, 47);
+}
+
+/* Estilo para la alerta de éxito */
+.alert-success {
+    width: 100%; /* Mismo ancho que los campos del formulario */
+    max-width: 400px; /* Máximo ancho igual al de los campos del formulario */
+    height: 40px; /* Mismo alto que los campos del formulario */
+    padding: 10px;
+    border: 1px solid #cccccc; /* Mismo borde que los campos del formulario */
+    border-radius: 5px; /* Mismo radio de borde que los campos del formulario */
+    background-color: rgb(255, 255, 255); /*Mismo color de fondo que el campo del formulario */
+    color: red; /* Color del texto verde */
+    font-size: 16px; /* Tamaño de fuente igual al del campo del formulario */
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Sombra sutil */
+    margin: 10px auto; /* Centrar el mensaje */
+    position: relative; /* Para el botón de cerrar */
+}
+
+.alert-dismissible .close {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    color: #4caf50; /* Color del ícono de cerrar */
+}
+
+/* Animación para ocultar el mensaje después de 3 segundos */
+@keyframes hideAlert {
+    0% { opacity: 1; }
+    99% { opacity: 1; }
+    100% { opacity: 0; }
+}
+
+.alert-success.hide {
+    animation: hideAlert 3s forwards;
+}
+.hide {
+    display: none;
+}
+/*----------------------------------------------------*/

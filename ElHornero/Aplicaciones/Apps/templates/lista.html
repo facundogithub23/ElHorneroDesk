@@ -1,0 +1,168 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Lista de Socios - El Hornero Tradición</title>
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+        <link rel="stylesheet" href="{% static 'css/lista.css' %}">
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+    <style>/* Estilos para la columna de acción */
+        #alert-container {
+    position: fixed;
+    top: 10px;
+    right: 10px;
+    background-color: #f8d7da;
+    color: #721c24;
+    border: 1px solid #f5c6cb;
+    border-radius: 5px;
+    padding: 10px;
+    z-index: 1000;
+}
+
+/* Estilos para el modal */
+.modal {
+    display: none; /* Oculto por defecto */
+    position: fixed; /* Fijo en la pantalla */
+    z-index: 1000; /* Por encima de otros elementos */
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto; /* Añadir barra de desplazamiento si es necesario */
+    background-color: rgba(0, 0, 0, 0.4); /* Fondo oscuro con opacidad */
+    text-align: center;
+}
+
+.modal-content {
+    background-color: #fefefe;
+    margin: 15% auto; /* 15% desde la parte superior y centrado horizontalmente */
+    padding: 20px;
+    border: 1px solid #888;
+    width: 80%; /* Ancho del modal */
+    max-width: 500px; /* Ancho máximo */
+    border-radius: 5px; /* Esquinas redondeadas */
+}
+
+#modalMessage {
+    margin-bottom: 20px;
+}
+
+button {
+    padding: 10px 20px;
+    margin: 5px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+#confirmButton {
+    background-color: #3085d6;
+    color: white;
+}
+
+#cancelButton {
+    background-color: #d33;
+    color: white;
+}
+
+
+/* Opcional: añadir estilos para el botón de eliminar si es necesario */
+#deleteButton {
+    background-color: #dc3545; /* Rojo */
+    color: white;
+}
+
+    </style>    
+</head>
+    
+<body>
+    <nav class="navbar navbar-dark bg-blue" style="display: flex; justify-content: space-between; align-items: center;">
+        <div>
+            <a class="navbar-brand hornero" href="{% url 'index' %}">El Hornero Tradición</a>
+            <a class="navbar-brand lista-socios" href="{% url 'lista_bajas' %}">Lista de Bajas</a>
+        </div>
+    </nav>
+    
+    <div class="custom-container">
+        <h2>Lista de socios</h2>
+    </div>
+    <div class="container table-container">
+        <div class="row">
+            <div class="col">
+                <div class="table-responsive">
+                    <table id="tabla_socios" class="table">
+                        <thead class="thead-dark">
+                            <tr>
+                                <th>#</th>
+                                <th>N° de Socio</th>
+                                <th>Nombre</th>
+                                <th>DNI</th>
+                                <th>Dirección</th>
+                                <th>Teléfono</th>
+                                <th>Email</th>
+                                <th>Fecha de Nac.</th>
+                                <th>Fecha de Reg.</th>
+                                <th>Acción</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tableBody_socios">
+                            {% for socio in socios %}
+                            <tr>
+                                <td>{{ forloop.counter }}</td>
+                                <td>{{ socio.num_socio }}</td>
+                                <td class="nombre">{{ socio.nombre }}</td>
+                                <td>{{ socio.dni }}</td>
+                                <td class="direccion">{{ socio.direccion }}</td>
+                                <td>{{ socio.telefono }}</td>
+                                <td>{{ socio.email }}</td>
+                                <td class="fecha-nacimiento">{{ socio.fecha_nacimiento|date:"d-m-Y" }}</td>
+                                <td class="fecha-registro">{{ socio.fecha_registro|date:"d-m-Y" }}</td>
+                                <td class="action-column">
+                                    <button class="action-button edit-button"data-id="{{ socio.id }}"onclick="confirmEditar({{ socio.id }})">
+                                        <i class="fas fa-edit"></i> 
+                                    </button>
+                                    <button class="action-button delete-button" data-id="{{ socio.id }}"onclick="confirmBaja({{ socio.id }})">
+                                        <i class="fas fa-ban"></i>
+                                    </button>
+                                    <button class="action-button delete-button btnEliminacion"onclick="confirmDelete({{ socio.id }})">
+                                        <i class="fas fa-trash-can"></i>
+                                    </button>
+
+
+                                
+                                
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+       <!-- Modal -->
+<!-- Modal -->
+<div id="customModal" class="modal">
+    <div class="modal-content">
+        <p id="modalMessage">Este es un mensaje personalizado.</p>
+        <button id="confirmButton">Confirmar</button>
+        <button id="cancelButton">Cancelar</button>
+    </div>
+</div>
+
+
+        
+        
+    </div>
+    <script>
+        
+    </script>
+    
+
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.min.js"></script>
+    <script src="{% static 'js/lista.js' %}"></script> <!-- Asegúrate de que esta ruta sea correcta -->
+</body>
+</html>
