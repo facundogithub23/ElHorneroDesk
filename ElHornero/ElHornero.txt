@@ -1,0 +1,1883 @@
+-------------INDEX----------------
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    {% load static %}
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <link rel="stylesheet" href="{% static 'css/styles.css' %}">
+    <title>El Hornero Tradición</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <style>
+           .form-input:focus {
+            border: 3px solid #0075ff !important;
+            outline: none !important;
+            box-shadow: 3px 0px 30px rgba(163, 163, 163, 0.4) !important;
+        }
+        .error-message {
+            font-size: 12px;
+            margin-bottom: 0;
+            display: none;
+        }
+        .error-message-activo {
+            display: block;
+        }
+        .formulario_validacion-estado {
+            position: absolute;
+            top: 12px;
+            right: 10px;
+            bottom: 15px;
+            z-index: 100;
+            font-size: 16px;
+            opacity: 0;
+            color: red;
+        }
+        .formulario_grupo-correcto .formulario_validacion-estado {
+            color: #1ed12d;
+            opacity: 1;
+        }
+        .formulario_grupo-incorrecto .formulario_validacion-estado {
+            color: #bb2929;
+            opacity: 1;
+        }
+        .formulario_grupo-incorrecto .form-input {
+            border: 3px solid #bb2929 !important;
+        }
+        .formulario_input-error  {
+            font-size: 16px;
+            margin-bottom: 0;
+            margin-top: -1; /* Ajusta la distancia al campo */
+            display: none;
+            color: #bb2929;
+            text-align: left; /* Alinea el texto a la izquierda */
+        }
+        .formulario_input-error-activo {
+            display: block;
+        }
+        .formulario_input-error {
+            font-size: 16px; /* Asegúrate de que esta propiedad tenga una unidad como 'px' */
+            margin-bottom: 0;
+            margin-top: -21px; /* Ajusta la separación entre el campo y el mensaje */
+            color: #bb2929;
+            position: relative; /* Cambia a 'absolute' si quieres moverlo con 'left', 'right', 'top', o 'bottom' */
+            left: 10px; /* Ajusta esta propiedad si necesitas mover el mensaje horizontalmente */
+        }
+        .formulario_input_error {
+            font-size: 16px;
+            margin-bottom: 0;
+            margin-top: -21px; /* Ajusta la separación entre el campo y el mensaje */
+            color: #bb2929;
+            position: relative;
+            left: 10px;
+            display: none; /* Oculta por defecto */
+            text-align: left;
+        }
+
+        .formulario_input_error-activo {
+            display: block; /* Muestra el mensaje de error */
+        }
+
+
+        /* Estilo para la alerta de éxito */
+.alert-success {
+    width: 100%; /* Mismo ancho que los campos del formulario */
+    max-width: 400px; /* Máximo ancho igual al de los campos del formulario */
+    height: 40px; /* Mismo alto que los campos del formulario */
+    padding: 10px;
+    border: 1px solid #cccccc; /* Mismo borde que los campos del formulario */
+    border-radius: 20px; /* Mismo radio de borde que los campos del formulario */
+    background-color: rgb(24, 217, 47);  /*Mismo color de fondo que el campo del formulario */
+    color: white; /* Color del texto verde */
+    font-size: 16px; /* Tamaño de fuente igual al del campo del formulario */
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Sombra sutil */
+    margin: 10px auto; /* Centrar el mensaje */
+    position: relative; /* Para el botón de cerrar */
+}
+
+
+
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-dark bg-blue" style="display: flex; justify-content: space-between; align-items: center;">
+        <div>
+            <a class="navbar-brand hornero" href="{% url 'index' %}">El Hornero Tradición</a>
+            <a class="navbar-brand lista-socios" href="{% url 'lista_socios' %}">Lista de Socios</a>
+        </div>
+        <form class="form-inline" action="" method="post" style="margin-top: 5px;">
+            <div class="search-container" style="position: relative;">
+                <input class="form-control mr-sm-2" type="search" placeholder="Buscar" aria-label="Search" style="width: 300px; height: 40px; padding: 10px; border: 1px solid #ced4da; border-radius: 5px; padding-right: 40px;">
+                <i class="formulario_validacion-estado fas fa-search search-icon" style="color: blue; position: absolute; right: 20px; top: 50%; transform: translateY(-50%);"></i>
+            </div>
+        </form>
+    </nav>
+    <div class="custom-container">
+        <div id="alert-container" class="alert alert-success hide" style="margin-top: -10px;">Registro exitoso</div><br>
+        <h2 style="margin-bottom: -35px; margin-top: -30px;">Formulario de Registro</h2> <br>
+        <form id="form-register" class="formulario" action="{% url 'registrar_socio' %}" method="post">
+            {% csrf_token %}
+            <div class="formulario_grupo" id="grupo_nombre">
+                <div class="input-container">
+                    <input type="text" name="nombre" id="nombre" autocomplete="name" placeholder="Ingrese un nombre" class="form-input" required>
+                    <i class="formulario_validacion-estado fas fa-times-circle"></i>
+                </div>
+                <p class="formulario_input-error">NOMBRE INVÁLIDO (el campo nombre debe tener solo letras y espacios)</p>
+            </div>
+            <div class="formulario_grupo" id="grupo_dni">
+                <div class="input-container">
+                    <input type="text" name="dni" id="dni" autocomplete="document-id" placeholder="Ingrese DNI" class="form-input" required>
+                    <i class="formulario_validacion-estado fas"></i>
+                </div>
+                <p id="error_dni" class="formulario_input-error hide">DNI INVÁLIDO (el campo permite hasta 8 dígitos)</p>
+                <p id="error_dni_existe" class="formulario_input_error hide">DNI ya existe</p>
+            </div>
+            
+            
+            <div class="formulario_grupo" id="grupo_direccion">
+                <div class="input-container">
+                    <input type="text" name="direccion" id="direccion" autocomplete="street-address" placeholder="Ingrese la dirección" class="form-input" required>
+                    <i class="formulario_validacion-estado fas fa-times-circle"></i>
+                </div>
+                <p class="formulario_input-error">DIRECCIÓN INVÁLIDA (puede tener letras, espacios y máximo 4 números)</p>
+            </div>
+        
+            <div class="formulario_grupo" id="grupo_telefono">
+                <div class="input-container">
+                    <input type="text" name="telefono" id="telefono" autocomplete="tel" placeholder="Ingrese el teléfono" class="form-input" required>
+                    <i class="formulario_validacion-estado fas fa-times-circle"></i>
+                </div>
+                <p class="formulario_input-error">TELÉFONO INVÁLIDO (máximo 20 caracteres, solo números, + , guiones o parentesis")</p>
+            </div>
+        
+            <div class="formulario_grupo" id="grupo_email">
+                <div class="input-container">
+                    <input type="email" name="email" id="email" autocomplete="email" placeholder="Ingrese el email" class="form-input" required>
+                    <i class="formulario_validacion-estado fas fa-times-circle"></i>
+                </div>
+                <p class="formulario_input-error">EMAIL INVÁLIDO (debe incluir "@")</p>
+            </div>
+        
+            <div class="formulario_grupo" id="grupo_num_socio">
+                <div class="input-container">
+                    <input type="text" name="num_socio" id="num_socio" autocomplete="n°socio" placeholder="Ingrese N° de Socio" class="form-input" required>
+                    <i class="formulario_validacion-estado fas fa-times-circle"></i>
+                </div>
+                <p class="formulario_input-error">N° DE SOCIO INVÁLIDO (máximo 10 caracteres, solo números)</p>
+                <p id="error_num_socio_existe" class="formulario_input_error hide">Número de socio ya existe</p>
+            </div>
+        
+            <div class="formulario_grupo" id="grupo_fecha_nacimiento">
+                <div class="input-container">
+                    <input type="text" name="fecha_nacimiento" id="fecha_nacimiento" autocomplete="bday" placeholder="Ingrese la fecha de nacimiento" class="form-input" required>
+                    <i class="formulario_validacion-estado fas fa-times-circle"></i>
+                </div>
+                <p class="formulario_input-error">FECHA DE NACIMIENTO INVÁLIDA (formato dd-mm-aaaa)</p>
+            </div>
+        
+            <button type="submit" class="btn-submit">Registrar</button>
+            
+        </form>
+    
+    </div>
+  
+   
+    <script src="{% static 'js/index.js' %}"></script>
+
+        
+    
+    
+
+
+
+</body>
+</html>
+-----------LISTA-------------------
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Lista de Socios - El Hornero Tradición</title>
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+        <link rel="stylesheet" href="{% static 'css/lista.css' %}">
+    <style>/* Estilos para la columna de acción */
+        
+    
+    </style>    
+</head>
+    
+<body>
+    <nav class="navbar navbar-dark bg-blue" style="display: flex; justify-content: space-between; align-items: center;">
+        <div>
+            <a class="navbar-brand hornero" href="{% url 'index' %}">El Hornero Tradición</a>
+            <a class="navbar-brand lista-socios" href="{% url 'lista_bajas' %}">Lista de Bajas</a>
+        </div>
+    </nav>
+    
+    <div class="custom-container">
+        <h2>Lista de socios</h2>
+    </div>
+    <div class="container table-container">
+        <div class="row">
+            <div class="col">
+                <div class="table-responsive">
+                    <table id="tabla_socios" class="table">
+                        <thead class="thead-dark">
+                            <tr>
+                                <th>#</th>
+                                <th>N° de Socio</th>
+                                <th>Nombre</th>
+                                <th>DNI</th>
+                                <th>Dirección</th>
+                                <th>Teléfono</th>
+                                <th>Email</th>
+                                <th>Fecha de Nac.</th>
+                                <th>Fecha de Reg.</th>
+                                <th>Acción</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tableBody_socios">
+                            {% for socio in socios %}
+                            <tr>
+                                <td>{{ forloop.counter }}</td>
+                                <td>{{ socio.num_socio }}</td>
+                                <td class="nombre">{{ socio.nombre }}</td>
+                                <td>{{ socio.dni }}</td>
+                                <td class="direccion">{{ socio.direccion }}</td>
+                                <td>{{ socio.telefono }}</td>
+                                <td>{{ socio.email }}</td>
+                                <td class="fecha-nacimiento">{{ socio.fecha_nacimiento|date:"d-m-Y" }}</td>
+                                <td class="fecha-registro">{{ socio.fecha_registro|date:"d-m-Y" }}</td>
+                                <td class="action-column">
+                                    <button class="action-button edit-button"data-id="{{ socio.id }}"onclick="confirmEditar({{ socio.id }})">
+                                        <i class="fas fa-edit"></i> 
+                                    </button>
+                                    <button class="action-button delete-button" data-id="{{ socio.id }}"onclick="confirmBaja({{ socio.id }})">
+                                        <i class="fas fa-ban"></i>
+                                    </button>
+                                    <button class="action-button delete-button btnEliminacion"onclick="confirmDelete({{ socio.id }})">
+                                        <i class="fas fa-trash-can"></i>
+                                    </button>
+
+
+                                
+                                
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+<script>
+
+</script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.min.js"></script>
+    <script src="{% static 'js/lista.js' %}"></script> <!-- Asegúrate de que esta ruta sea correcta -->
+</body>
+</html>
+----------EDICIONsOCIO-----------------
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    {% load static %}
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <link rel="stylesheet" href="{% static 'css/styles.css' %}">
+    <title>El Hornero Tradición</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <style>
+        .form-input:focus {
+            border: 3px solid #0075ff !important;
+            outline: none !important;
+            box-shadow: 3px 0px 30px rgba(163, 163, 163, 0.4) !important;
+        }
+        .error-message {
+            font-size: 12px;
+            margin-bottom: 0;
+            display: none;
+        }
+        .error-message-activo {
+            display: block;
+        }
+        .formulario_validacion-estado {
+            position: absolute;
+            top: 12px;
+            right: 10px;
+            bottom: 15px;
+            z-index: 100;
+            font-size: 16px;
+            opacity: 0;
+            color: red;
+        }
+        .formulario_grupo-correcto .formulario_validacion-estado {
+            color: #1ed12d;
+            opacity: 1;
+        }
+        .formulario_grupo-incorrecto .formulario_validacion-estado {
+            color: #bb2929;
+            opacity: 1;
+        }
+        .formulario_grupo-incorrecto .form-input {
+            border: 3px solid #bb2929 !important;
+        }
+        .formulario_input-error {
+            font-size: 12px;
+            margin-bottom: 0;
+            margin-top: -1; /* Ajusta la distancia al campo */
+            display: none;
+            color: #bb2929;
+            text-align: left; /* Alinea el texto a la izquierda */
+        }
+        .formulario_input-error-activo {
+            display: block;
+        }
+        .formulario_input-error {
+            font-size: 16px; /* Asegúrate de que esta propiedad tenga una unidad como 'px' */
+            margin-bottom: 0;
+            margin-top: -21px; /* Ajusta la separación entre el campo y el mensaje */
+            color: #bb2929;
+            position: relative; /* Cambia a 'absolute' si quieres moverlo con 'left', 'right', 'top', o 'bottom' */
+            left: 10px; /* Ajusta esta propiedad si necesitas mover el mensaje horizontalmente */
+        }
+        /* Estilo para la alerta de éxito */
+    .alert-success {
+        width: 100%; /* Mismo ancho que los campos del formulario */
+        max-width: 400px; /* Máximo ancho igual al de los campos del formulario */
+        height: 40px; /* Mismo alto que los campos del formulario */
+        padding: 10px;
+        border: 1px solid #cccccc; /* Mismo borde que los campos del formulario */
+        border-radius: 20px; /* Mismo radio de borde que los campos del formulario */
+        background-color: rgb(24, 217, 47);  /*Mismo color de fondo que el campo del formulario */
+        color: white; /* Color del texto verde */
+        font-size: 16px; /* Tamaño de fuente igual al del campo del formulario */
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Sombra sutil */
+        margin: 10px auto; /* Centrar el mensaje */
+        position: relative; /* Para el botón de cerrar */
+    }
+    /* Aplica un estilo específico a todos los campos de entrada que están en readonly */
+input[readonly] {
+    background-color: #f0f0f0; /* Cambia el color de fondo */
+    color: #333; /* Cambia el color del texto */
+    border: 2px solid #ccc; /* Cambia el borde */
+    cursor: not-allowed; /* Cambia el cursor para indicar que no es editable */
+}
+
+/* Aplica un estilo específico solo a los campos DNI y Fecha de Nacimiento */
+input#dni[readonly],
+input#fecha_nacimiento[readonly] {
+    background-color: #e0e0e0; /* Otro color de fondo */
+    color: #666; /* Otro color de texto */
+    border: 2px solid #bbb; /* Otro estilo de borde */
+    cursor: default; /* Mantén el cursor como predeterminado */
+}
+/* Estilo para campos en readonly */
+.form-input[readonly]:focus {
+    border: 3px solid #cccccc !important; /* Contorno gris */
+    box-shadow: none !important; /* Eliminar la sombra */
+}
+
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-dark bg-blue" style="display: flex; justify-content: space-between; align-items: center;">
+        <div>
+            <a class="navbar-brand hornero" href="{% url 'index' %}">El Hornero Tradición</a>
+            <a class="navbar-brand lista-socios" href="{% url 'lista_socios' %}">Lista de Socios</a>
+        </div>
+       
+    </nav>
+    <div class="custom-container">
+        <div id="alert-container" class="alert alert-success hide" style="margin-top: -10px;">Socio editado exitosamente</div><br>
+        <h2 style="margin-bottom: -35px; margin-top: -30px;">Edicion de Socio</h2>
+        <form id="form-register" class="formulario" action="{% url 'editar_socio' %}" method="post">
+            {% csrf_token %}
+            <input type="hidden" name="id" value="{{ socio.id }}">
+            
+            <div class="formulario_grupo" id="grupo_nombre">
+                <div class="input-container">
+                    <input type="text" name="nombre" id="nombre" autocomplete="name" value="{{ socio.nombre }}" placeholder="Ingrese un nombre" class="form-input" required>
+                    <i class="formulario_validacion-estado fas fa-times-circle"></i>
+                </div>
+                <p class="formulario_input-error">NOMBRE INVÁLIDO (el campo nombre debe tener solo letras y espacios)</p>
+            </div>
+            
+            <div class="formulario_grupo" id="grupo_dni">
+                <div class="input-container">
+                    <input type="text" name="dni" id="dni" value="{{ socio.dni }}" autocomplete="document-id" placeholder="Ingrese DNI" class="form-input" readonly required>
+                    <i class="formulario_validacion-estado fas fa-times-circle"></i>
+                </div>
+                <p class="formulario_input-error">DNI INVÁLIDO (el campo debe tener exactamente 8 dígitos)</p>
+            </div>
+            
+            <div class="formulario_grupo" id="grupo_direccion">
+                <div class="input-container">
+                    <input type="text" name="direccion" id="direccion" autocomplete="street-address" value="{{ socio.direccion }}" placeholder="Ingrese la dirección" class="form-input" required>
+                    <i class="formulario_validacion-estado fas fa-times-circle"></i>
+                </div>
+                <p class="formulario_input-error">DIRECCIÓN INVÁLIDA (puede tener letras, espacios y máximo 4 números)</p>
+            </div>
+            
+            <div class="formulario_grupo" id="grupo_telefono">
+                <div class="input-container">
+                    <input type="text" name="telefono" id="telefono" autocomplete="tel" value="{{ socio.telefono }}" placeholder="Ingrese el teléfono" class="form-input" required>
+                    <i class="formulario_validacion-estado fas fa-times-circle"></i>
+                </div>
+                <p class="formulario_input-error">TELÉFONO INVÁLIDO (máximo 20 caracteres, solo números, + , guiones o parentesis)</p>
+            </div>
+            
+            <div class="formulario_grupo" id="grupo_email">
+                <div class="input-container">
+                    <input type="email" name="email" id="email" autocomplete="email" value="{{ socio.email }}" placeholder="Ingrese el email" class="form-input" required>
+                    <i class="formulario_validacion-estado fas fa-times-circle"></i>
+                </div>
+                <p class="formulario_input-error">EMAIL INVÁLIDO (debe incluir "@")</p>
+            </div>
+            
+            <div class="formulario_grupo" id="grupo_num_socio">
+                <div class="input-container">
+                    <input type="text" name="num_socio" id="num_socio" value="{{ socio.num_socio }}" placeholder="Ingrese N° de Socio" class="form-input" readonly required>
+                    <i class="formulario_validacion-estado fas fa-times-circle"></i>
+                </div>
+                <p class="formulario_input-error">N° DE SOCIO INVÁLIDO (máximo 10 caracteres, solo números)</p>
+            </div>
+            
+            <div class="formulario_grupo" id="grupo_fecha_nacimiento">
+                <div class="input-container">
+                    <input type="text" name="fecha_nacimiento" id="fecha_nacimiento" value="{{ socio.fecha_nacimiento|date:'d-m-Y' }}" placeholder="Ingrese la fecha de nacimiento" class="form-input" readonly required>
+                    <i class="formulario_validacion-estado fas fa-times-circle"></i>
+                </div>
+                <p class="formulario_input-error">FECHA DE NACIMIENTO INVÁLIDA (formato dd-mm-aaaa)</p>
+            </div>
+            
+            <button type="submit" class="btn-submit">Modificar</button>
+        </form>
+        
+    
+    </div>
+ 
+    <script src="{% static 'js/edicionSocio.js' %}"></script>
+
+</body>
+</html>
+-----------BAJA----------------
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Lista de Socios - El Hornero Tradición</title>
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+        <link rel="stylesheet" href="{% static 'css/lista.css' %}">
+    <style>
+          .table td, .table th {
+            color: red;}
+    </style>
+</head>
+    
+<body>
+    <nav class="navbar navbar-dark bg-blue" style="display: flex; justify-content: space-between; align-items: center;">
+        <div>
+            <a class="navbar-brand hornero" href="{% url 'index' %}">El Hornero Tradición</a>
+            <a class="navbar-brand lista-socios" href="{% url 'lista_socios' %}">Lista de Socios</a>
+        </div>
+    </nav>
+    
+    <div class="custom-container">
+        <h2>Lista de Bajas</h2>
+    </div>
+    <div class="container table-container">
+        <div class="row">
+            <div class="col">
+                <div class="table-responsive">
+                    <table id="tabla_socios" class="table">
+                        <thead class="thead-dark">
+                            <tr>
+                                <th>#</th>
+                                <th>N° de Socio</th>
+                                <th>Nombre</th>
+                                <th>DNI</th>
+                                <th>Dirección</th>
+                                <th>Teléfono</th>
+                                <th>Email</th>
+                                <th>Fecha de Nac.</th>
+                                <th>Fecha de Reg.</th>
+                                <th>Acción</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tableBody_socios">
+                            {% for socio in socios %}
+                            <tr>
+                                <td>{{ forloop.counter }}</td>
+                                <td>{{ socio.num_socio }}</td>
+                                <td class="nombre">{{ socio.nombre }}</td>
+                                <td>{{ socio.dni }}</td>
+                                <td class="direccion">{{ socio.direccion }}</td>
+                                <td>{{ socio.telefono }}</td>
+                                <td>{{ socio.email }}</td>
+                                <td class="fecha-nacimiento">{{ socio.fecha_nacimiento|date:"d-m-Y" }}</td>
+                                <td class="fecha-registro">{{ socio.fecha_registro|date:"d-m-Y" }}</td>
+                                <td class="action-column">
+                                   
+                                    <button class="action-button delete-button"onclick="confirmAlta({{ socio.id }})">
+                                        <i class="fas fa-arrow-up"style="color: green;"></i>
+
+                                    </button>
+                                    <button class="action-button delete-button btnEliminacion"onclick="confirmDelete({{ socio.id }})">
+                                        <i class="fas fa-trash-can"></i>
+                                    </button>
+
+
+                                
+                                
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.min.js"></script>
+    <script src="{% static 'js/lista.js' %}"></script> <!-- Asegúrate de que esta ruta sea correcta -->
+</body>
+</html>
+--------styles.css-----------
+* {
+    padding: 0;
+    margin: 0;
+    box-sizing: border-box;
+}
+
+body {
+    width: 100%;
+    height: 100vh;
+    background-color: rgb(0, 166, 255);
+    font-family: 'Roboto', sans-serif;
+    overflow-x: hidden; /* Oculta el desplazamiento horizontal si hay algún problema */
+}
+
+/* Estilos del Navbar */
+.navbar {
+    background-color: rgb(0, 166, 255);
+    color: white;
+    padding: 10px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.navbar-brand.hornero {
+    color: white;
+    margin-left: 20px;
+}
+
+.navbar-brand.lista-socios {
+    color: white;
+    margin-right: 20px; /* Puedes ajustar el margen según sea necesario */
+}
+
+.navbar-brand {
+    margin-right: 20px;
+    text-decoration: none;
+    font-weight: bold;
+}
+
+.search-container {
+    position: relative;
+}
+
+.form-inline {
+    margin-right: 20px;
+}
+
+/* Estilos del contenedor principal */
+.custom-container {
+    text-align: center;
+    margin-top: 20px; /* Ajustado para reducir el espacio */
+}
+
+.custom-container h2 {
+    font-size: 22px;
+    margin-bottom: -10px; /* Ajusta este valor para reducir la distancia con los campos del formulario */
+    margin-top: 10px; /* Ajusta el margen superior según sea necesario */
+    padding-bottom: 7px;
+    position: relative;
+}
+
+h1 {
+    font-size: 22px;
+    margin-bottom: 7px;
+    padding-bottom: 7px;
+    position: relative;
+}
+
+h1::after {
+    content: "";
+    position: absolute;
+    height: 3px;
+    border-radius: 3px;
+    width: 120px;
+    left: 50%;
+    bottom: 0;
+    transform: translateX(-50%);
+}
+
+/* Estilos del campo de búsqueda en el navbar */
+.navbar-collapse form .form-control {
+    border-radius: 10px; /* Añade bordes redondeados */
+    border-color: transparent; /* Elimina el borde */
+    padding-left: 35px; /* Añade espacio a la izquierda para el icono */
+    background-image: url('https://cdn-icons-png.flaticon.com/512/64/64576.png'); /* Agrega el ícono de lupa */
+    background-size: 20px; /* Tamaño del ícono */
+    background-repeat: no-repeat; /* Evita que se repita */
+    background-position: 10px center; /* Posición del ícono */
+}
+
+/* Estilo del botón de búsqueda en el navbar */
+.navbar-collapse form .btn {
+    border-radius: 10px; /* Añade bordes redondeados */
+    margin-left: 10px; /* Añade espacio entre el campo y el botón */
+}
+
+/* Estilos del formulario */
+#form-register {
+    max-width: 50%;
+    width: 100%;
+    padding: 30px;
+    border-radius: 10px;
+    background-color: rgb(0, 166, 255);
+    color: white;
+    margin: 5px auto;
+}
+
+/* Estilos de los campos del formulario */
+.form-input, .form-control {
+    width: 100%;
+    height: 40px;
+    padding: 12px 6px;
+    margin-bottom: 25px;
+    border: 1px solid #ccc; /* Color del borde del campo de formulario */
+    outline: none;
+    background-color: white;
+    color: black;
+    border-radius: 10px;
+}
+
+.form-group {
+    margin-top: 20px; /* Espacio entre cada par de campo de entrada y mensaje de error */
+}
+.form-input:focus {
+    border: 3px solid #0075ff; /* Cambia el borde a azul */
+    outline: none; /* Elimina cualquier contorno adicional */
+    box-shadow: 0px 0px 10px rgba(0, 117, 255, 0.4); /* Aplica una sombra azul */
+}
+
+
+.input-container {
+    position: relative;
+}
+
+.error-message {
+    display: none;
+    color: red;
+    font-size: 14px;
+    position: absolute;
+    bottom: 30px; /* Ajusta según sea necesario */
+    left: 0;
+}
+
+/* Estilos del botón de envío */
+.btn-submit {
+    width: 100%;
+    height: 40px;
+    padding: 12px 6px;
+    border: none;
+    cursor: pointer;
+    border-radius: 20px;
+    background-color:  rgb(24, 217, 47);
+    color: white;
+    font-size: 18px;
+    transition: background-color 0.5s;
+    margin-bottom: 25px;
+}
+
+.btn-submit:hover {
+    background: rgb(24, 217, 47);
+}
+
+/* Estilo para la alerta de éxito */
+.alert-success {
+    width: 100%; /* Mismo ancho que los campos del formulario */
+    max-width: 400px; /* Máximo ancho igual al de los campos del formulario */
+    height: 40px; /* Mismo alto que los campos del formulario */
+    padding: 10px;
+    border: 1px solid #cccccc; /* Mismo borde que los campos del formulario */
+    border-radius: 5px; /* Mismo radio de borde que los campos del formulario */
+    background-color: rgb(255, 255, 255); /*Mismo color de fondo que el campo del formulario */
+    color: red; /* Color del texto verde */
+    font-size: 16px; /* Tamaño de fuente igual al del campo del formulario */
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Sombra sutil */
+    margin: 10px auto; /* Centrar el mensaje */
+    position: relative; /* Para el botón de cerrar */
+}
+
+.alert-dismissible .close {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    color: #4caf50; /* Color del ícono de cerrar */
+}
+
+/* Animación para ocultar el mensaje después de 3 segundos */
+@keyframes hideAlert {
+    0% { opacity: 1; }
+    99% { opacity: 1; }
+    100% { opacity: 0; }
+}
+
+.alert-success.hide {
+    animation: hideAlert 3s forwards;
+}
+.hide {
+    display: none;
+}
+/*----------------------------------------------------*/
+----------lista.css---------
+/* Estilos generales */
+* {
+    padding: 0;
+    margin: 0;
+    box-sizing: border-box;
+}
+
+/* Estilo del fondo del body */
+body {
+    width: 100%;
+    height: 100vh;
+    background-color: rgb(0, 166, 255); /* Celeste */
+    font-family: 'Roboto', sans-serif;
+}
+
+/* Estilos del Navbar */
+.navbar {
+    background-color: rgb(0, 166, 255);
+    color: white;
+    padding: 10px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.navbar-brand.hornero {
+    color: white;
+    margin-left: 20px;
+    margin-right: 20px;
+    text-decoration: none;
+    font-weight: bold;
+}
+
+.navbar-brand.lista-socios {
+    color: white;
+    margin-right: 20px;
+    text-decoration: none;
+    font-weight: bold;
+}
+
+/* Estilo del contenedor de los enlaces del otro nav */
+.navbar.navbar-dark.bg-blue {
+    margin-top: 10px;
+}
+
+/* Estilos del formulario de búsqueda */
+.form-inline {
+    margin-left: auto;
+    margin-right: 20px;
+    display: flex;
+    align-items: center;
+}
+
+/* Estilos del campo de búsqueda */
+.form-control {
+    border-radius: 20px;
+    margin-left: 10px;
+    width: 200px;
+}
+
+/* Estilos del contenedor principal */
+.custom-container {
+    text-align: center;
+    margin-top: 20px;
+}
+
+/* Estilos del formulario */
+#form-register {
+    max-width: 50%;
+    width: 100%;
+    padding: 30px;
+    border-radius: 10px;
+    background-color: rgb(0, 166, 255);
+    color: white;
+    margin: 10px auto;
+}
+
+h1 {
+    font-size: 22px;
+    margin-bottom: 7px;
+    padding-bottom: 7px;
+    position: relative;
+}
+
+h1::after {
+    content: "";
+    position: absolute;
+    height: 3px;
+    border-radius: 3px;
+    width: 120px;
+    left: 50%;
+    bottom: 0;
+    transform: translateX(-50%);
+}
+
+/* Estilos de los campos del formulario */
+.form-input {
+    width: 100%;
+    height: 40px;
+    padding: 12px 6px;
+    margin-bottom: 25px;
+    border: none;
+    outline: none;
+    background-color: white;
+    color: black;
+    border-radius: 10px;
+}
+
+
+/* Estilos del botón de envío */
+.btn-submit {
+    width: 100%;
+    height: 40px;
+    padding: 12px 6px;
+    border: none;
+    cursor: pointer;
+    border-radius: 20px;
+    background-color: #4CAF50;
+    color: white;
+    font-size: 18px;
+    transition: background-color 0.5s;
+    margin-bottom: 25px;
+}
+
+.btn-submit:hover {
+    background: #45a049;
+}
+
+/* Estilos de la tabla */
+.table {
+    border-collapse: collapse;
+    width: 80%;
+    margin: 20px auto;
+}
+
+/* Estilos del encabezado de la tabla */
+/* Estilos del encabezado de la tabla */
+.table thead th {
+    background-color: black;  /* Fondo oscuro para el encabezado */
+    color: #ffffff; /* Texto blanco */ 
+    padding: 12px; /* Espaciado dentro de las celdas del encabezado */ 
+    text-align: center; /* Alinea el texto al centro */
+    border-bottom: 1px solid #ddd; /* Línea debajo del encabezado */
+   /*S position: sticky; /* Hace que el encabezado se quede en la parte superior al hacer scroll */
+    top: 0; /* Alineación al top */
+    z-index: 1; /* Asegura que el encabezado esté por encima de las filas */
+}
+
+
+/* Estilos de las celdas de la tabla */
+.table th, .table td {
+    padding: 12px; /* Espaciado dentro de las celdas */
+    text-align: center; /* Alinea el texto a la izquierda */
+    border-bottom: 1px solid #ddd; /* Línea debajo de cada celda */
+    vertical-align: middle; /* Alineación vertical del contenido */
+}
+
+.table td {
+    background-color: white; /* Asegúrate de que el fondo sea blanco */
+    color: black; /* Texto negro */
+}
+
+/* Estilo para asegurar que el ancho de las celdas sea consistente */
+.table th, .table td {
+    white-space: nowrap; /* Evita los saltos de línea en las celdas */
+}
+
+/* Estilos para la columna de acción */
+.action-column {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 14px;
+    background-color: white; /* Fondo blanco */
+}
+
+/* Estilos de los botones de acción */
+.action-button {
+    background-color: white; /* Fondo blanco */
+    margin: 0 3px;
+    width: 36px;
+    height: 36px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border: none;
+    cursor: pointer;
+    font-size: 18px;
+    transition: color 0.3s ease;
+    box-shadow: none;
+}
+
+/* Estilo para el botón de edición */
+.edit-button {
+    color: #1e00ff; /* Azul para edición */
+}
+
+.edit-button:hover {
+    color: #1e00ff; /* Azul oscuro en hover */
+}
+
+/* Estilo para el botón de eliminación */
+.delete-button {
+    color: #dc3545; /* Rojo para eliminación */
+}
+
+.delete-button:hover {
+    color: #c82333; /* Rojo oscuro en hover */
+}
+
+/* Estilos para las fechas */
+.fecha-nacimiento, .fecha-registro, .nombre, .direccion {
+    white-space: nowrap; /* Evita los saltos de línea */
+}
+--------index.js-------------
+document.addEventListener('DOMContentLoaded', () => {
+    const formulario = document.getElementById("form-register");
+    const inputs = document.querySelectorAll('#form-register input');
+    const alertContainer = document.getElementById('alert-container');
+
+    const expresiones = {
+        nombre: /^[a-zA-ZÑñÁáÉéÍíÓóÚúÜü\s]+$/, // Acepta letras, espacios, ñ y acentos
+        dni: /^\d{1,8}$/,
+        direccion: /^[a-zA-Z\s]*\d{0,4}[a-zA-Z\s]*$/,
+        telefono: /^[\d\-\+\(\)\s]{1,20}$/,
+        email: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
+        num_socio: /^\d{1,10}$/,
+        fecha_nacimiento: /^\d{2}-\d{2}-\d{4}$/ // DD-MM-YYYY
+    };
+
+    const validarFormulario = async (e) => {
+        const campo = e.target.name;
+        if (expresiones[campo]) {
+            await validarCampo(expresiones[campo], e.target, campo);
+        }
+    };
+
+    const validarCampo = async (expresion, input, campo) => {
+        const grupo = document.getElementById(`grupo_${campo}`);
+        const icono = grupo.querySelector('i');
+        const mensajeError = grupo.querySelector('.formulario_input-error');
+        const mensajeNumSocioExiste = grupo.querySelector('#error_num_socio_existe');
+        const mensajeDniExiste = grupo.querySelector('#error_dni_existe');
+    
+        if (input.value.trim() === '') {
+            // Campo vacío
+            grupo.classList.remove('formulario_grupo-correcto', 'formulario_grupo-incorrecto');
+            icono.classList.remove('fa-check-circle', 'fa-times-circle');
+            mensajeError.classList.remove('formulario_input_error-activo');
+            mensajeNumSocioExiste.classList.add('hide');
+            mensajeDniExiste.classList.add('hide');
+        } else if (expresion.test(input.value)) {
+            if (campo === 'num_socio') {
+                const existencia = await verificarExistencia(null, input.value);
+                if (existencia.existe_num_socio) {
+                    // Número de socio ya existe
+                    grupo.classList.add('formulario_grupo-incorrecto');
+                    grupo.classList.remove('formulario_grupo-correcto');
+                    icono.classList.add('fa-times-circle');
+                    icono.classList.remove('fa-check-circle');
+                    mensajeNumSocioExiste.classList.remove('hide');
+                    mensajeNumSocioExiste.classList.add('formulario_input_error-activo');
+                    mensajeError.classList.add('hide');
+                } else {
+                    // Número de socio no existe
+                    grupo.classList.remove('formulario_grupo-incorrecto');
+                    grupo.classList.add('formulario_grupo-correcto');
+                    icono.classList.add('fa-check-circle');
+                    icono.classList.remove('fa-times-circle');
+                    mensajeNumSocioExiste.classList.add('hide');
+                    mensajeNumSocioExiste.classList.remove('formulario_input_error-activo');
+                    mensajeError.classList.add('hide');
+                }
+            } else if (campo === 'dni') {
+                const existencia = await verificarExistencia(input.value, null);
+                if (existencia.existe_dni) {
+                    // DNI ya existe
+                    grupo.classList.add('formulario_grupo-incorrecto');
+                    grupo.classList.remove('formulario_grupo-correcto');
+                    icono.classList.add('fa-times-circle');
+                    icono.classList.remove('fa-check-circle');
+                    mensajeDniExiste.classList.remove('hide');
+                    mensajeDniExiste.classList.add('formulario_input_error-activo');
+                    mensajeError.classList.add('hide');
+                } else {
+                    // DNI no existe
+                    grupo.classList.remove('formulario_grupo-incorrecto');
+                    grupo.classList.add('formulario_grupo-correcto');
+                    icono.classList.add('fa-check-circle');
+                    icono.classList.remove('fa-times-circle');
+                    mensajeDniExiste.classList.add('hide');
+                    mensajeDniExiste.classList.remove('formulario_input_error-activo');
+                    mensajeError.classList.add('hide');
+                }
+            } else if (campo === 'fecha_nacimiento') {
+                // Validar fecha de nacimiento
+                const fechaNacimiento = input.value;
+                if (!expresion.test(fechaNacimiento)) {
+                    grupo.classList.add('formulario_grupo-incorrecto');
+                    grupo.classList.remove('formulario_grupo-correcto');
+                    icono.classList.add('fa-times-circle');
+                    icono.classList.remove('fa-check-circle');
+                    mensajeError.classList.add('formulario_input_error-activo');
+                } else {
+                    // Fecha de nacimiento válida
+                    grupo.classList.remove('formulario_grupo-incorrecto');
+                    grupo.classList.add('formulario_grupo-correcto');
+                    icono.classList.add('fa-check-circle');
+                    icono.classList.remove('fa-times-circle');
+                    mensajeError.classList.remove('formulario_input_error-activo'); // Oculta el mensaje de error cuando el valor es válido
+                }
+                mensajeNumSocioExiste.classList.add('hide');
+                mensajeDniExiste.classList.add('hide');
+            } else {
+                // Validación para otros campos
+                grupo.classList.remove('formulario_grupo-incorrecto');
+                grupo.classList.add('formulario_grupo-correcto');
+                icono.classList.add('fa-check-circle');
+                icono.classList.remove('fa-times-circle');
+                mensajeError.classList.add('hide');
+                mensajeNumSocioExiste.classList.add('hide');
+                mensajeDniExiste.classList.add('hide');
+            }
+        } else {
+            // Valor no válido según la expresión regular
+            grupo.classList.add('formulario_grupo-incorrecto');
+            grupo.classList.remove('formulario_grupo-correcto');
+            icono.classList.add('fa-times-circle');
+            icono.classList.remove('fa-check-circle');
+            mensajeError.classList.add('formulario_input_error-activo');
+            mensajeNumSocioExiste.classList.add('hide');
+            mensajeDniExiste.classList.add('hide');
+        }
+    };
+
+    const verificarExistencia = async (dni, num_socio) => {
+        try {
+            console.log(`Verificando existencia con DNI: ${dni} y Número de Socio: ${num_socio}`);
+
+            const response = await fetch(`/verificar_existencia/?dni=${dni || ''}&num_socio=${num_socio || ''}`);
+            if (!response.ok) {
+                throw new Error('Error en la verificación');
+            }
+            const data = await response.json();
+            return data;
+        } catch (error) {
+            console.error('Error al verificar existencia:', error);
+            return { existe_dni: false, existe_num_socio: false };
+        }
+    };
+
+    inputs.forEach((input) => {
+        input.addEventListener('keyup', validarFormulario);
+        input.addEventListener('blur', validarFormulario);
+    });
+
+    formulario.addEventListener('submit', async (e) => {
+        e.preventDefault();
+
+        const formData = new FormData(formulario);
+        const dni = formData.get('dni');
+        const num_socio = formData.get('num_socio');
+
+        // Limpia los mensajes de error antes de validar
+        document.getElementById('error_dni_existe').classList.add('hide');
+        document.getElementById('error_num_socio_existe').classList.add('hide');
+
+        const existencia = await verificarExistencia(dni, num_socio);
+        let formIsValid = true;
+
+        if (existencia.existe_dni) {
+            document.getElementById('error_dni_existe').classList.remove('hide');
+            formIsValid = false;
+        }
+
+        if (existencia.existe_num_socio) {
+            document.getElementById('error_num_socio_existe').classList.remove('hide');
+            formIsValid = false;
+        }
+
+        if (!formIsValid) {
+            showAlert('Por favor, corrija los errores en el formulario.', false);
+            return;
+        }
+
+        const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+
+        try {
+            const response = await fetch(formulario.action, {
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': csrfToken,
+                    'Content-Type': 'application/x-www-form-urlencoded'
+                },
+                body: new URLSearchParams(formData).toString()
+            });
+
+            if (!response.ok) {
+                throw new Error(`Error: ${response.statusText}`);
+            }
+
+            const data = await response.json();
+            if (data.success) {
+                showAlert('¡SOCIO REGISTRADO CON ÉXITO!', true);
+                formulario.reset(); // Limpia el formulario
+                document.querySelectorAll('.formulario_grupo-correcto').forEach((icono) => {
+                    icono.classList.remove('formulario_grupo-correcto');
+                });
+                
+                lista_socios(); // Actualizar la lista de socios después del registro
+            } else {
+                showAlert('Ocurrió un error al registrar el socio. Intente nuevamente.', false);
+            }
+        } catch (error) {
+            showAlert('Ocurrió un error al registrar el socio. Intente nuevamente.', false);
+        }
+    });
+
+    const showAlert = (message, success) => {
+        const alertType = success ? 'alert-success' : 'alert-danger';
+        const alertHTML = `<div class="alert ${alertType} alert-dismissible fade show" role="alert">${message}<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button></div>`;
+        alertContainer.innerHTML = alertHTML;
+    };
+});
+
+lista_socios();
+--------lista.js-------------
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Lista de Socios - El Hornero Tradición</title>
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+        <link rel="stylesheet" href="{% static 'css/lista.css' %}">
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+    <style>/* Estilos para la columna de acción */
+        #alert-container {
+    position: fixed;
+    top: 10px;
+    right: 10px;
+    background-color: #f8d7da;
+    color: #721c24;
+    border: 1px solid #f5c6cb;
+    border-radius: 5px;
+    padding: 10px;
+    z-index: 1000;
+}
+
+/* Estilos para el modal */
+.modal {
+    display: none; /* Oculto por defecto */
+    position: fixed; /* Fijo en la pantalla */
+    z-index: 1000; /* Por encima de otros elementos */
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto; /* Añadir barra de desplazamiento si es necesario */
+    background-color: rgba(0, 0, 0, 0.4); /* Fondo oscuro con opacidad */
+    text-align: center;
+}
+
+.modal-content {
+    background-color: #fefefe;
+    margin: 15% auto; /* 15% desde la parte superior y centrado horizontalmente */
+    padding: 20px;
+    border: 1px solid #888;
+    width: 80%; /* Ancho del modal */
+    max-width: 500px; /* Ancho máximo */
+    border-radius: 5px; /* Esquinas redondeadas */
+}
+
+#modalMessage {
+    margin-bottom: 20px;
+}
+
+button {
+    padding: 10px 20px;
+    margin: 5px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+#confirmButton {
+    background-color: #3085d6;
+    color: white;
+}
+
+#cancelButton {
+    background-color: #d33;
+    color: white;
+}
+
+
+/* Opcional: añadir estilos para el botón de eliminar si es necesario */
+#deleteButton {
+    background-color: #dc3545; /* Rojo */
+    color: white;
+}
+
+    </style>    
+</head>
+    
+<body>
+    <nav class="navbar navbar-dark bg-blue" style="display: flex; justify-content: space-between; align-items: center;">
+        <div>
+            <a class="navbar-brand hornero" href="{% url 'index' %}">El Hornero Tradición</a>
+            <a class="navbar-brand lista-socios" href="{% url 'lista_bajas' %}">Lista de Bajas</a>
+        </div>
+    </nav>
+    
+    <div class="custom-container">
+        <h2>Lista de socios</h2>
+    </div>
+    <div class="container table-container">
+        <div class="row">
+            <div class="col">
+                <div class="table-responsive">
+                    <table id="tabla_socios" class="table">
+                        <thead class="thead-dark">
+                            <tr>
+                                <th>#</th>
+                                <th>N° de Socio</th>
+                                <th>Nombre</th>
+                                <th>DNI</th>
+                                <th>Dirección</th>
+                                <th>Teléfono</th>
+                                <th>Email</th>
+                                <th>Fecha de Nac.</th>
+                                <th>Fecha de Reg.</th>
+                                <th>Acción</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tableBody_socios">
+                            {% for socio in socios %}
+                            <tr>
+                                <td>{{ forloop.counter }}</td>
+                                <td>{{ socio.num_socio }}</td>
+                                <td class="nombre">{{ socio.nombre }}</td>
+                                <td>{{ socio.dni }}</td>
+                                <td class="direccion">{{ socio.direccion }}</td>
+                                <td>{{ socio.telefono }}</td>
+                                <td>{{ socio.email }}</td>
+                                <td class="fecha-nacimiento">{{ socio.fecha_nacimiento|date:"d-m-Y" }}</td>
+                                <td class="fecha-registro">{{ socio.fecha_registro|date:"d-m-Y" }}</td>
+                                <td class="action-column">
+                                    <button class="action-button edit-button"data-id="{{ socio.id }}"onclick="confirmEditar({{ socio.id }})">
+                                        <i class="fas fa-edit"></i> 
+                                    </button>
+                                    <button class="action-button delete-button" data-id="{{ socio.id }}"onclick="confirmBaja({{ socio.id }})">
+                                        <i class="fas fa-ban"></i>
+                                    </button>
+                                    <button class="action-button delete-button btnEliminacion"onclick="confirmDelete({{ socio.id }})">
+                                        <i class="fas fa-trash-can"></i>
+                                    </button>
+
+
+                                
+                                
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+       <!-- Modal -->
+<!-- Modal -->
+<div id="customModal" class="modal">
+    <div class="modal-content">
+        <p id="modalMessage">Este es un mensaje personalizado.</p>
+        <button id="confirmButton">Confirmar</button>
+        <button id="cancelButton">Cancelar</button>
+    </div>
+</div>
+
+
+        
+        
+    </div>
+    <script>
+        
+    </script>
+    
+
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.min.js"></script>
+    <script src="{% static 'js/lista.js' %}"></script> <!-- Asegúrate de que esta ruta sea correcta -->
+</body>
+</html>
+
+--------edicion.js-----------
+document.addEventListener('DOMContentLoaded', () => {
+    const formulario = document.getElementById("form-register");
+    const inputs = document.querySelectorAll('#form-register input');
+    const alertContainer = document.getElementById('alert-container');
+    const tablaSocios = document.getElementById('tabla-socios');
+
+    // Definir expresiones regulares para validación
+    const expresiones = {
+        nombre: /^[a-zA-ZÑñÁáÉéÍíÓóÚúÜü\s]+$/, // Acepta letras, espacios, ñ y acentos
+        dni: /^\d{1,8}$/,
+        direccion: /^[a-zA-Z\s\d]{1,50}$/,
+        telefono: /^[\d+\-\(\)\s]{1,20}$/,
+        email: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
+        num_socio: /^\d{1,10}$/,
+        fecha_nacimiento: /^\d{2}-\d{2}-\d{4}$/
+    };
+
+    inputs.forEach(input => {
+        input.addEventListener('input', () => validarCampo(input));
+    });
+
+    function validarCampo(input) {
+        const campo = input.name;
+        const grupo = document.getElementById(`grupo_${campo}`);
+        const inputError = grupo.querySelector('.formulario_input-error');
+        const estadoIcono = grupo.querySelector('.formulario_validacion-estado');
+        const valor = input.value;
+
+        if (expresiones[campo] && !expresiones[campo].test(valor)) {
+            grupo.classList.add('formulario_grupo-incorrecto');
+            grupo.classList.remove('formulario_grupo-correcto');
+            estadoIcono.classList.add('fa-times-circle');
+            estadoIcono.classList.remove('fa-check-circle');
+            inputError.textContent = `${campo.toUpperCase()} INVÁLIDO`;
+        } else {
+            grupo.classList.add('formulario_grupo-correcto');
+            grupo.classList.remove('formulario_grupo-incorrecto');
+            estadoIcono.classList.add('fa-check-circle');
+            estadoIcono.classList.remove('fa-times-circle');
+            inputError.textContent = '';
+        }
+    }
+
+    formulario.addEventListener('submit', async (e) => {
+        e.preventDefault();
+
+        const formData = new FormData(formulario);
+        let formIsValid = true; // Declarar la variable formIsValid
+
+        inputs.forEach(input => {
+            const campo = input.name;
+            if (expresiones[campo] && !expresiones[campo].test(input.value)) {
+                formIsValid = false;
+            }
+        });
+
+        /*if (!formIsValid) {
+            showAlert('Por favor, corrija los errores en el formulario.', false);
+            return;
+        }*/
+
+        const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+
+        try {
+            const response = await fetch(formulario.action, {
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': csrfToken,
+                    'Content-Type': 'application/x-www-form-urlencoded'
+                },
+                body: new URLSearchParams(formData).toString()
+            });
+
+            if (!response.ok) {
+                throw new Error(`Error: ${response.statusText}`); // Corregir el error de sintaxis
+            }
+
+            const data = await response.json();
+            if (data.status === 'success') {
+                showAlert(data.message, true);
+
+                // Reseteo manual de campos
+                inputs.forEach(input => {
+                    input.value = '';
+
+            const grupo = document.getElementById(`grupo_${input.name}`);
+            if (grupo) {
+                grupo.classList.remove('formulario_grupo-correcto', 'formulario_grupo-incorrecto');
+                const estadoIcono = grupo.querySelector('.formulario_validacion-estado');
+                if (estadoIcono) {
+                    estadoIcono.classList.remove('fa-check-circle', 'fa-times-circle');
+                }
+            }
+        });
+
+             
+                
+                lista_socios();
+            } else {
+                showAlert(data.message, false);
+            }
+        } catch (error) {
+            console.error('Error:', error);
+            showAlert('Ocurrió un error al editar el socio', false);
+        }
+    });
+
+    function showAlert(message, success) {
+        if (alertContainer) {
+            alertContainer.textContent = message;
+            alertContainer.classList.remove('hide');
+            alertContainer.classList.toggle('alert-success', success);
+            alertContainer.classList.toggle('alert-danger', !success);
+            setTimeout(() => {
+                alertContainer.classList.add('hide');
+            }, 3000);
+        }
+    }
+
+    function lista_socios() {
+        fetch('/obtener_lista_socios_json/')
+            .then(response => response.json())
+            .then(data => {
+                if (tablaSocios) {
+                    tablaSocios.innerHTML = '';
+                    data.forEach(socio => {
+                        const row = document.createElement('div');
+                        row.textContent = `${socio.nombre} - ${socio.dni}`; // Corregir interpolación de cadenas
+                        tablaSocios.appendChild(row);
+                    });
+                }
+            })
+            .catch(error => console.error('Error:', error));
+    }
+
+    lista_socios();
+});
+-----------models.py------------
+from django.db import models
+from django.utils import timezone
+class Socio(models.Model):
+    id = models.AutoField(primary_key=True)
+    num_socio = models.IntegerField()  # Cambia el nombre del campo a num_socio
+    nombre = models.CharField(max_length=100)
+    dni = models.CharField(max_length=20)
+    direccion = models.CharField(max_length=200)
+    telefono = models.CharField(max_length=20)
+    email = models.EmailField()
+    fecha_nacimiento = models.DateField()
+    fecha_registro = models.DateField(default=timezone.now)
+    baja = models.BooleanField(default=False)
+
+
+    class Meta:
+        db_table = 'socio'
+    
+   
+-----------urls.py--------------
+from django.urls import path
+from . import views
+
+urlpatterns = [
+    path('', views.index, name='index'),
+    path('lista_socios/', views.lista_socios, name='lista_socios'),
+    path('registrar_socio/', views.registrar_socio, name='registrar_socio'),
+    path('obtener_lista_socios_json/', views.obtener_datos_json, name='obtener_lista_socios_json'),
+    path('edicion_socio/<int:id>/', views.edicion_socio, name='edicion_socio'),
+    path('editar_socio', views.editar_socio, name='editar_socio'),
+    path('obtener_datos_json_edicion/<int:id>/', views.obtener_datos_json_edicion, name='obtener_datos_json_edicion'),
+    path('validar_dni_num_socio/', views.validar_dni_num_socio, name='validar_dni_num_socio'),
+    path('dar_baja_socio/<int:socio_id>/', views.dar_baja_socio, name='dar_baja_socio'),
+    path('baja/', views.lista_bajas, name='lista_bajas'),
+    path('eliminar_socio/<int:id>/', views.eliminar_socio, name='eliminar_socio'),
+    path('eliminar_socio_baja/<int:id>/', views.eliminar_socio_baja, name='eliminar_socio_baja'),
+    path('dar_alta_socio/<int:socio_id>/', views.dar_alta_socio, name='dar_alta_socio'),
+    path('verificar_existencia/', views.verificar_existencia, name='verificar_existencia'),
+
+]
+
+-----------views.py-------------
+from django.shortcuts import get_object_or_404, render, redirect
+from django.http import HttpResponse, JsonResponse
+from .models import Socio
+from .forms import SocioForm
+import json
+from django.views.decorators.csrf import csrf_exempt
+from django.shortcuts import render
+from django.http import JsonResponse
+from django.contrib import messages
+from .models import Socio
+from datetime import datetime
+
+
+def index(request):
+    if request.method == 'POST':
+        # Procesamiento del formulario de registro
+        nombre = request.POST.get('nombre')
+        dni = request.POST.get('dni')
+        direccion = request.POST.get('direccion')
+        telefono = request.POST.get('telefono')
+        email = request.POST.get('email')
+        num_socio = request.POST.get('num_socio')
+        fecha_nacimiento_str = request.POST.get('fecha_nacimiento')  # Asegúrate de que coincida con el nombre del campo en el formulario
+
+        try:
+            # Convertir la fecha de cadena a objeto datetime
+            fecha_nacimiento = datetime.strptime(fecha_nacimiento_str, '%d/%m/%Y').date()
+            # Intentar guardar el socio en la base de datos
+            nuevo_socio = Socio(
+                nombre=nombre, 
+                dni=dni, 
+                direccion=direccion, 
+                telefono=telefono, 
+                email=email, 
+                num_socio=num_socio, 
+                fecha_nacimiento=fecha_nacimiento
+            )
+            nuevo_socio.full_clean()  # Validar los campos del modelo
+            nuevo_socio.save()
+            # Mostrar mensaje de éxito
+            messages.success(request, '¡SOCIO REGISTRADO CON ÉXITO!')
+        except Exception as e:
+            # Manejar errores de validación
+            messages.error(request, f'Ocurrió un error al registrar al socio: {str(e)}')
+
+    # Renderizar la plantilla index.html con los mensajes
+    return render(request, 'index.html', {'messages': messages.get_messages(request)})
+def lista_socios(request):
+    socios = Socio.objects.filter(baja=False)  # Solo socios activos
+    return render(request, 'lista.html', {'socios': socios})
+
+    # Renderizar la plantilla con la lista de socios
+    return render(request, 'lista.html', {'socios': socios})
+def verificar_existencia(request):
+    dni = request.GET.get('dni', None)
+    num_socio = request.GET.get('num_socio', None)
+    existe_dni = Socio.objects.filter(dni=dni).exists() if dni else False
+    existe_num_socio = Socio.objects.filter(num_socio=num_socio).exists() if num_socio else False
+    return JsonResponse({'existe_dni': existe_dni, 'existe_num_socio': existe_num_socio})
+def lista_bajas(request):
+    socios_bajas = Socio.objects.filter(baja=True)
+    return render(request, 'baja.html', {'socios': socios_bajas})
+@csrf_exempt
+def registrar_socio(request):
+    if request.method == 'POST':
+        nombre = request.POST.get('nombre')
+        dni = request.POST.get('dni')
+        direccion = request.POST.get('direccion')
+        telefono = request.POST.get('telefono')
+        email = request.POST.get('email')
+        num_socio = request.POST.get('num_socio')
+        fecha_nacimiento_str = request.POST.get('fecha_nacimiento')
+
+        try:
+            # Intentar convertir la fecha
+            fecha_nacimiento = datetime.strptime(fecha_nacimiento_str, '%d-%m-%Y').date()
+            
+            # Intentar guardar el socio en la base de datos
+            nuevo_socio = Socio(
+                nombre=nombre, 
+                dni=dni, 
+                direccion=direccion, 
+                telefono=telefono, 
+                email=email, 
+                num_socio=num_socio, 
+                fecha_nacimiento=fecha_nacimiento
+            )
+            nuevo_socio.full_clean()  # Validar los campos del modelo
+            nuevo_socio.save()
+            return JsonResponse({'success': True})
+        except ValueError:
+            return JsonResponse({'error': 'Formato de fecha inválido'}, status=400)
+        except Exception as e:
+            return JsonResponse({'error': str(e)}, status=400)
+    return JsonResponse({'error': 'Método no permitido'}, status=405)
+
+
+def validar_dni_num_socio(request):
+    dni = request.GET.get('dni', None)
+    num_socio = request.GET.get('num_socio', None)
+    
+    data = {
+        'dni_existe': Socio.objects.filter(dni=dni).exists(),
+        'num_socio_existe': Socio.objects.filter(num_socio=num_socio).exists(),
+    }
+    return JsonResponse(data)
+def obtener_lista_socios_json(request):
+    socios = list(Socio.objects.values('nombre', 'dni'))
+    return JsonResponse(socios, safe=False)
+
+def obtener_datos_json(request):
+    socios = Socio.objects.all().values('id', 'num_socio', 'nombre', 'dni', 'direccion', 'telefono', 'email', 'fecha_nacimiento', 'fecha_registro')
+    data = list(socios)
+    return JsonResponse(data, safe=False)
+
+def edicion_socio(request, id):
+    socio = Socio.objects.get(id=id)
+    return render(request, 'edicionSocio.html', {'socio': socio})
+
+def editar_socio(request):
+    if request.method == 'POST':
+        try:
+            id = request.POST.get('id')
+            socio = Socio.objects.get(id=id)
+            socio.nombre = request.POST.get('nombre')
+            socio.direccion = request.POST.get('direccion')
+            socio.telefono = request.POST.get('telefono')
+            socio.email = request.POST.get('email')
+            socio.save()
+
+            # Utilizar messages.success para enviar un mensaje de éxito
+            messages.success(request, '¡SOCIO MODIFICADO CON ÉXITO!')
+
+            # Devuelve una respuesta JSON indicando éxito
+            return JsonResponse({'status': 'success', 'message': '¡SOCIO MODIFICADO CON ÉXITO!'})
+
+        except Exception as e:
+            # Utilizar messages.error para enviar un mensaje de error
+            messages.error(request, f'Ocurrió un error al modificar el socio: {str(e)}')
+            # Devuelve una respuesta JSON indicando error
+            return JsonResponse({'status': 'error', 'message': str(e)})
+
+    # Devuelve una respuesta JSON indicando que el método no está permitido
+    return JsonResponse({'status': 'error', 'message': 'Método no permitido'})
+def obtener_datos_json_edicion(request, id):
+    # Buscar el socio por ID
+    socio = get_object_or_404(Socio, id=id)
+    
+    # Preparar los datos en formato JSON
+    data = {
+        'id': socio.id,
+        'num_socio': socio.num_socio,
+        'nombre': socio.nombre,
+        'dni': socio.dni,
+        'direccion': socio.direccion,
+        'telefono': socio.telefono,
+        'email': socio.email,
+        'fecha_nacimiento': socio.fecha_nacimiento.strftime('%d-%m-%Y'),
+        'fecha_registro': socio.fecha_registro.strftime('%d-%m-%Y'),
+    }
+
+    return JsonResponse(data)
+
+def dar_baja_socio(request, socio_id):
+    socio = get_object_or_404(Socio, id=socio_id)
+    socio.baja = True  # Marca al socio como dado de baja
+    socio.save()
+    return redirect('lista_socios')  # Redirige usando el nombre de la ruta
+
+def dar_alta_socio(request, socio_id):
+    socio = get_object_or_404(Socio, id=socio_id)
+    socio.baja = False  # Marca al socio como dado de baja
+    socio.save()
+    return redirect('lista_bajas')  # Redirige usando el nombre de la ruta
+
+
+def eliminar_socio(request, id):
+    print(f"ID recibido: {id}")  # Agrega esto para depuración
+    socio = get_object_or_404(Socio, id=id)
+    socio.delete()
+    return redirect('lista_socios')  # Redirige usando el nombre de la ruta
+def eliminar_socio_baja(request, id):
+    print(f"ID recibido: {id}")  # Agrega esto para depuración
+    socio = get_object_or_404(Socio, id=id)
+    socio.delete()
+    return redirect('lista_bajas')  # Redirige usando el nombre de la ruta
+
+---baja.html definitivo---------
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Lista de Socios - El Hornero Tradición</title>
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+        <link rel="stylesheet" href="{% static 'css/lista.css' %}">
+        <style>/* Estilos para la columna de acción */
+            #alert-container {
+        position: fixed;
+        top: 10px;
+        right: 10px;
+        background-color: #f8d7da;
+        color: #721c24;
+        border: 1px solid #f5c6cb;
+        border-radius: 5px;
+        padding: 10px;
+        z-index: 1000;
+    }
+    
+    /* Estilos para el modal */
+    .modal {
+        display: none; /* Oculto por defecto */
+        position: fixed; /* Fijo en la pantalla */
+        z-index: 1000; /* Por encima de otros elementos */
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        overflow: auto; /* Añadir barra de desplazamiento si es necesario */
+        background-color: rgba(0, 0, 0, 0.4); /* Fondo oscuro con opacidad */
+        text-align: center;
+    }
+    
+    .modal-content {
+        background-color: #fefefe;
+        margin: 15% auto; /* 15% desde la parte superior y centrado horizontalmente */
+        padding: 20px;
+        border: 1px solid #888;
+        width: 80%; /* Ancho del modal */
+        max-width: 500px; /* Ancho máximo */
+        border-radius: 5px; /* Esquinas redondeadas */
+    }
+    
+    #modalMessage {
+        margin-bottom: 20px;
+    }
+    
+    button {
+        padding: 10px 20px;
+        margin: 5px;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+    }
+    
+    #confirmButton {
+        background-color: #3085d6;
+        color: white;
+    }
+    
+    #cancelButton {
+        background-color: #d33;
+        color: white;
+    }
+    
+    
+    /* Opcional: añadir estilos para el botón de eliminar si es necesario */
+    #deleteButton {
+        background-color: #dc3545; /* Rojo */
+        color: white;
+    }
+    .table td, .table th {
+            color: red;}
+   
+        </style> 
+          
+</head>
+    
+<body>
+    <nav class="navbar navbar-dark bg-blue" style="display: flex; justify-content: space-between; align-items: center;">
+        <div>
+            <a class="navbar-brand hornero" href="{% url 'index' %}">El Hornero Tradición</a>
+            <a class="navbar-brand lista-socios" href="{% url 'lista_socios' %}">Lista de Socios</a>
+        </div>
+    </nav>
+    
+    <div class="custom-container">
+        <h2>Lista de Bajas</h2>
+    </div>
+    <div class="container table-container">
+        <div class="row">
+            <div class="col">
+                <div class="table-responsive">
+                    <table id="tabla_socios" class="table">
+                        <thead class="thead-dark">
+                            <tr>
+                                <th>#</th>
+                                <th>N° de Socio</th>
+                                <th>Nombre</th>
+                                <th>DNI</th>
+                                <th>Dirección</th>
+                                <th>Teléfono</th>
+                                <th>Email</th>
+                                <th>Fecha de Nac.</th>
+                                <th>Fecha de Reg.</th>
+                                <th>Acción</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tableBody_socios">
+                            {% for socio in socios %}
+                            <tr>
+                                <td>{{ forloop.counter }}</td>
+                                <td>{{ socio.num_socio }}</td>
+                                <td class="nombre">{{ socio.nombre }}</td>
+                                <td>{{ socio.dni }}</td>
+                                <td class="direccion">{{ socio.direccion }}</td>
+                                <td>{{ socio.telefono }}</td>
+                                <td>{{ socio.email }}</td>
+                                <td class="fecha-nacimiento">{{ socio.fecha_nacimiento|date:"d-m-Y" }}</td>
+                                <td class="fecha-registro">{{ socio.fecha_registro|date:"d-m-Y" }}</td>
+                                <td class="action-column">
+                                   
+                                    <button class="action-button delete-button"onclick="confirmAlta({{ socio.id }})">
+                                        <i class="fas fa-arrow-up"style="color: green;"></i>
+
+                                    </button>
+                                    <button class="action-button delete-button btnEliminacion"onclick="confirmDelete({{ socio.id }})">
+                                        <i class="fas fa-trash-can"></i>
+                                    </button>
+
+
+                                
+                                
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+               <!-- Modal -->
+<!-- Modal -->
+<div id="customModal" class="modal">
+    <div class="modal-content">
+        <p id="modalMessage">Este es un mensaje personalizado.</p>
+        <button id="confirmButton">Confirmar</button>
+        <button id="cancelButton">Cancelar</button>
+    </div>
+</div>
+    </div>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.min.js"></script>
+    <script src="{% static 'js/lista.js' %}"></script> <!-- Asegúrate de que esta ruta sea correcta -->
+</body>
+</html>
+
